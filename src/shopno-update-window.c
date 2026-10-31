@@ -292,20 +292,6 @@ footer_new (GtkWidget **hint)
 
 
 static GtkWidget *
-button_new (const gchar *label,
-            gboolean     suggested)
-{
-  GtkWidget *button = gtk_button_new_with_mnemonic (label);
-
-  if (suggested)
-    add_class (button, "suggested-action");
-
-  return button;
-}
-
-
-
-static GtkWidget *
 source_row_new (SourceRow   *row,
                 const gchar *title)
 {
@@ -407,7 +393,7 @@ build_checking_page (ShopnoUpdateWindow *self)
   GtkWidget *body = gtk_box_new (GTK_ORIENTATION_VERTICAL, 12);
   GtkWidget *spinner = gtk_spinner_new ();
   GtkWidget *footer = footer_new (NULL);
-  GtkWidget *cancel = button_new (_("_Cancel"), FALSE);
+  GtkWidget *cancel = gtk_button_new_with_mnemonic (_("_Cancel"));
 
   add_class (body, "shopno-body");
   gtk_widget_set_valign (body, GTK_ALIGN_CENTER);
@@ -443,8 +429,8 @@ build_updates_page (ShopnoUpdateWindow *self)
   GtkWidget *frame;
   GtkWidget *hint;
   GtkWidget *footer = footer_new (&hint);
-  GtkWidget *skip = button_new (_("_Skip"), FALSE);
-  GtkWidget *upgrade = button_new (_("_Upgrade"), TRUE);
+  GtkWidget *skip = gtk_button_new_with_mnemonic (_("_Skip"));
+  GtkWidget *upgrade = gtk_button_new_with_mnemonic (_("_Upgrade"));
 
   add_class (header, "shopno-header");
   add_class (icon, "shopno-accent");
@@ -644,8 +630,8 @@ build_result_page (ShopnoUpdateWindow *self)
   gtk_box_pack_start (GTK_BOX (body), GTK_WIDGET (self->result_notice), FALSE, FALSE, 0);
   gtk_box_pack_start (GTK_BOX (body), GTK_WIDGET (self->result_details), FALSE, FALSE, 0);
 
-  self->result_primary = GTK_BUTTON (button_new (NULL, TRUE));
-  self->result_secondary = button_new (_("_Close"), FALSE);
+  self->result_primary = GTK_BUTTON (gtk_button_new_with_mnemonic (NULL));
+  self->result_secondary = gtk_button_new_with_mnemonic (_("_Close"));
   gtk_widget_show (self->result_secondary);
   gtk_widget_set_no_show_all (self->result_secondary, TRUE);
   g_signal_connect_swapped (self->result_primary, "clicked", G_CALLBACK (on_result_primary), self);
@@ -1771,7 +1757,14 @@ shopno_update_window_new (GtkApplication *application)
 void
 shopno_update_load_style (void)
 {
+  g_autoptr(GtkCssProvider) colors = gtk_css_provider_new ();
   g_autoptr(GtkCssProvider) provider = gtk_css_provider_new ();
+
+  /* Below the theme, so these colors only fill in what it leaves out */
+  gtk_css_provider_load_from_resource (colors, RESOURCE_PATH "/shopno-update-helper-colors.css");
+  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                             GTK_STYLE_PROVIDER (colors),
+                                             GTK_STYLE_PROVIDER_PRIORITY_FALLBACK);
 
   gtk_css_provider_load_from_resource (provider, RESOURCE_PATH "/shopno-update-helper.css");
   gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),

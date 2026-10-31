@@ -1,0 +1,9 @@
+/*
+ * Status colors for themes that do not define them. Loaded below the
+ * theme, so a theme's own success_color, warning_color and error_color
+ * win. These read on light and dark backgrounds.
+ */
+
+@define-color success_color #26a269;
+@define-color warning_color #c88800;
+@define-color error_color #d0323d;

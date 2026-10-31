@@ -1,6 +1,6 @@
 /*
- * Shopno Update Helper styles. Colors come from the GTK theme where it
- * has one; the status colors work on light and dark themes.
+ * Shopno Update Helper styles. All colors come from the GTK theme;
+ * shopno-update-helper-colors.css fills in any the theme does not define.
  */
 
 .shopno-body {
@@ -52,15 +52,15 @@
 }
 
 .shopno-success {
-  color: #26a269;
+  color: @success_color;
 }
 
 .shopno-warning {
-  color: #c88800;
+  color: @warning_color;
 }
 
 .shopno-error {
-  color: #d0323d;
+  color: @error_color;
 }
 
 /* Lists */
@@ -100,8 +100,8 @@ list.shopno-list > row.shopno-section {
   padding: 10px 14px;
   margin: 0 24px 12px 24px;
   border-radius: 6px;
-  border: 1px solid alpha(#e5a50a, 0.45);
-  background-color: alpha(#e5a50a, 0.14);
+  border: 1px solid alpha(@warning_color, 0.45);
+  background-color: alpha(@warning_color, 0.14);
 }
 
 .shopno-body .shopno-notice {
@@ -144,15 +144,15 @@ list.shopno-list > row.shopno-section {
 }
 
 .shopno-step-done .shopno-step-number {
-  border-color: #26a269;
-  background-color: #26a269;
-  color: #ffffff;
+  border-color: @success_color;
+  background-color: @success_color;
+  color: @theme_selected_fg_color;
 }
 
 .shopno-step-failed .shopno-step-number {
-  border-color: #d0323d;
-  background-color: #d0323d;
-  color: #ffffff;
+  border-color: @error_color;
+  background-color: @error_color;
+  color: @theme_selected_fg_color;
 }
 
 .shopno-step-line {

@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/com/jadupc/ShopnoUpdateHelper">
     <file>shopno-update-helper.css</file>
+    <file>shopno-update-helper-colors.css</file>
     <file>icons/scalable/status/shopno-error-symbolic.svg</file>
     <file>icons/scalable/status/shopno-offline-symbolic.svg</file>
     <file>icons/scalable/status/shopno-question-symbolic.svg</file>
