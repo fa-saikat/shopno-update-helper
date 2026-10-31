@@ -1,0 +1,6 @@
+data/shopno-update-helper.desktop.in
+src/shopno-apt.c
+src/shopno-apt-upgrade.c
+src/shopno-flatpak.c
+src/shopno-update-helper.c
+src/shopno-update-window.c

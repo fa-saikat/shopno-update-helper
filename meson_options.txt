@@ -1,0 +1,6 @@
+option('flatpak', type: 'feature', value: 'auto',
+  description: 'Update Flatpak apps after system packages (needs libflatpak)')
+option('tests', type: 'boolean', value: true,
+  description: 'Build the unit tests')
+option('preview', type: 'boolean', value: false,
+  description: 'Build shopno-update-preview, which shows each page with sample data')

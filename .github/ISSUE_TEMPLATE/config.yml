@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and help
+    url: https://github.com/fa-saikat/shopno-update-helper/discussions
+    about: Ask how to install or use Update Helper.
+  - name: Security vulnerability
+    url: https://github.com/fa-saikat/shopno-update-helper/security/advisories/new
+    about: Report security problems privately, not as a public issue. See SECURITY.md.

@@ -1,0 +1,137 @@
+name: Packages
+
+# Builds and test-installs the packages. On a version tag, also attaches
+# them to a draft GitHub release, to be checked and published by hand.
+
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - 'packaging/**'
+      - '.github/workflows/packages.yml'
+      - 'meson.build'
+      - 'data/meson.build'
+      - 'src/meson.build'
+  workflow_dispatch:
+
+env:
+  NAME: shopno-update-helper
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  version:
+    name: Check version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: version
+        name: Read version
+        run: |
+          version=$(sed -n "s/^ *version: '\(.*\)',$/\1/p" meson.build | head -1)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          # The Debian changelog must carry the same version as meson.build
+          grep -q "^$NAME ($version-" packaging/debian/changelog
+
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in meson.build"
+            exit 1
+          fi
+
+  deb:
+    name: ${{ matrix.name }}
+    needs: version
+    runs-on: ubuntu-24.04
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Debian 13 (.deb)
+            image: debian:trixie
+            suffix: debian13
+          - name: Debian 12 (.deb)
+            image: debian:bookworm
+            suffix: debian12
+          - name: Ubuntu 24.04 (.deb)
+            image: ubuntu:24.04
+            suffix: ubuntu24.04
+          - name: Ubuntu 22.04 (.deb)
+            image: ubuntu:22.04
+            suffix: ubuntu22.04
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential devscripts equivs
+          cp -r packaging/debian debian
+          mk-build-deps --install --remove --tool 'apt-get -y --no-install-recommends' debian/control
+
+      - name: Build
+        run: |
+          # One package per release, so the version says which one it is for
+          version=${{ needs.version.outputs.version }}
+          sed -i "1s/($version-\([0-9]*\))/($version-\1~${{ matrix.suffix }})/" debian/changelog
+          dpkg-buildpackage -b -us -uc
+          mkdir out
+          mv ../*.deb out/
+          ls -l out
+
+      - name: Test install
+        run: |
+          apt-get install -y ./out/${NAME}_*.deb
+          test -x /usr/bin/shopno-update-helper
+          test -x /usr/libexec/shopno-update-helper/apt-refresh
+          test -x /usr/libexec/shopno-update-helper/apt-upgrade
+          test -f /usr/share/applications/com.jadupc.ShopnoUpdateHelper.desktop
+          test -f /usr/share/polkit-1/actions/com.jadupc.shopno-update-helper.policy
+          grep -q /usr/libexec/shopno-update-helper/apt-upgrade \
+            /usr/share/polkit-1/actions/com.jadupc.shopno-update-helper.policy
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.suffix }}
+          path: out/${{ env.NAME }}_*.deb
+
+  release:
+    name: Draft release
+    if: github.ref_type == 'tag'
+    needs: [version, deb]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: dist
+        run: |
+          # GitHub replaces "~" in uploaded file names with ".", so rename
+          # first to keep SHA256SUMS matching the downloads
+          shopt -s nullglob
+          for file in *~*; do
+            mv "$file" "${file//\~/.}"
+          done
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          name: Shopno Update Helper ${{ needs.version.outputs.version }}
+          generate_release_notes: true
+          files: dist/*

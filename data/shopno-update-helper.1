@@ -1,0 +1,54 @@
+.TH SHOPNO-UPDATE-HELPER 1 "October 2026" "shopno-update-helper 0.1.0" "User Commands"
+.SH NAME
+shopno-update-helper \- check for and install system and Flatpak updates
+.SH SYNOPSIS
+.B shopno-update-helper
+.SH DESCRIPTION
+.B shopno-update-helper
+refreshes the package lists, shows what
+.B apt-get full-upgrade
+would change, and lists Flatpak apps and runtimes with updates.
+On request it installs the system packages first, then the Flatpak updates.
+.PP
+System packages are installed in a terminal inside the window, so questions
+asked by packages, such as debconf dialogs and configuration file prompts,
+can be answered there. The terminal opens by itself when a package asks
+something, and can be opened at any time with
+.BR Details .
+.PP
+Refreshing the package lists and updating Flatpak apps need no password for
+the active local user. Installing system packages asks for an administrator
+password once, through polkit.
+.SH FILES
+.TP
+.I /usr/libexec/shopno-update-helper/apt-refresh
+Runs
+.B apt-get update
+as root. Started through
+.BR pkexec (1).
+.TP
+.I /usr/libexec/shopno-update-helper/apt-upgrade
+Runs
+.BR "dpkg \-\-configure \-a" ,
+.B apt-get \-f install
+and
+.B apt-get full-upgrade
+as root. Started through
+.BR pkexec (1).
+.TP
+.I /usr/share/polkit-1/actions/com.jadupc.shopno-update-helper.policy
+Who may run the helpers.
+.SH ENVIRONMENT
+.TP
+.B G_MESSAGES_DEBUG=shopno-update
+Print debug messages.
+.SH SEE ALSO
+.BR apt-get (8),
+.BR flatpak (1),
+.BR pkexec (1),
+.BR polkit (8)
+.SH AUTHOR
+Written by FA Saikat at JaduPc.
+.SH COPYRIGHT
+Copyright \(co 2026 JaduPc and FA Saikat.
+License GPLv3+: GNU GPL version 3 or later.

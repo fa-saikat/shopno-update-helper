@@ -1,0 +1,88 @@
+name: Bug report
+description: Something does not work, crashes, or behaves differently than described
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. If the problem could let someone
+        gain root or change the system without permission, do not open an issue:
+        follow [SECURITY.md](https://github.com/fa-saikat/shopno-update-helper/blob/main/SECURITY.md) instead.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you start
+      options:
+        - label: I searched the [existing issues](https://github.com/fa-saikat/shopno-update-helper/issues?q=is%3Aissue) and this has not been reported.
+          required: true
+        - label: I am on the latest release, or I built the latest `main`.
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Where did it happen?
+      options:
+        - Checking for updates
+        - The list of updates
+        - Installing system packages
+        - A package asked a question
+        - Updating Flatpak apps
+        - The result screen
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Update Helper version
+      description: Output of `dpkg -s shopno-update-helper | grep Version`, or the commit you built.
+      placeholder: 0.1.0-1
+    validations:
+      required: true
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: Debian 13
+    validations:
+      required: true
+
+  - type: input
+    id: desktop
+    attributes:
+      label: Desktop and polkit agent
+      placeholder: Xfce 4.20, polkit-gnome
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details log
+      description: |
+        Open **Details** in the window and paste what it shows. Run
+        `shopno-update-helper` from a terminal to see warnings as well.
+      render: text
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or video

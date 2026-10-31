@@ -1,0 +1,29 @@
+name: Packaging request or problem
+description: Ask for a package for your distribution, or report a broken package
+labels: [packaging]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Request type
+      options:
+        - Package for another Debian or Ubuntu based distribution
+        - Problem with an existing package
+    validations:
+      required: true
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: Linux Mint 22
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: For a broken package, the exact error and the command you ran.
+    validations:
+      required: true

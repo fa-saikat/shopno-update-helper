@@ -1,0 +1,39 @@
+Source: shopno-update-helper
+Section: admin
+Priority: optional
+Maintainer: FA Saikat <fahimabrar.saikat@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ gettext,
+ libflatpak-dev (>= 1.12),
+ libglib2.0-dev (>= 2.72),
+ libgtk-3-dev (>= 3.24),
+ libvte-2.91-dev (>= 0.68),
+ meson,
+ ninja-build,
+ pkgconf,
+Standards-Version: 4.7.0
+Homepage: https://github.com/fa-saikat/shopno-update-helper
+Vcs-Browser: https://github.com/fa-saikat/shopno-update-helper
+Vcs-Git: https://github.com/fa-saikat/shopno-update-helper.git
+Rules-Requires-Root: no
+
+Package: shopno-update-helper
+Architecture: any
+Depends:
+ apt,
+ pkexec | policykit-1,
+ polkitd | policykit-1,
+ whiptail | dialog,
+ ${misc:Depends},
+ ${shlibs:Depends},
+Recommends:
+ polkit-1-auth-agent,
+Description: simple graphical updater for system packages and Flatpak apps
+ Update Helper checks for updates, shows what will change, and installs
+ the updates when asked: system packages through apt first, then Flatpak
+ apps and runtimes.
+ .
+ Packages that ask questions while installing, such as debconf dialogs,
+ configuration file prompts or repository key imports, are answered in a
+ terminal inside the window, so no separate terminal opens.

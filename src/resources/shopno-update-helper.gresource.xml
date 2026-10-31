@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/jadupc/ShopnoUpdateHelper">
+    <file>shopno-update-helper.css</file>
+    <file>icons/scalable/status/shopno-error-symbolic.svg</file>
+    <file>icons/scalable/status/shopno-offline-symbolic.svg</file>
+    <file>icons/scalable/status/shopno-question-symbolic.svg</file>
+    <file>icons/scalable/status/shopno-skipped-symbolic.svg</file>
+    <file>icons/scalable/status/shopno-success-symbolic.svg</file>
+    <file>icons/scalable/status/shopno-update-symbolic.svg</file>
+    <file>icons/scalable/status/shopno-warning-symbolic.svg</file>
+  </gresource>
+</gresources>

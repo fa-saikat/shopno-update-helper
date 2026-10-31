@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Debian 13
+            image: debian:trixie
+            options: -Dflatpak=enabled
+          - name: Debian 12
+            image: debian:bookworm
+            options: -Dflatpak=enabled
+          - name: Ubuntu 24.04
+            image: ubuntu:24.04
+            options: -Dflatpak=enabled
+          - name: Ubuntu 22.04
+            image: ubuntu:22.04
+            options: -Dflatpak=enabled
+          - name: Debian 13, without Flatpak
+            image: debian:trixie
+            options: -Dflatpak=disabled
+    env:
+      DEBIAN_FRONTEND: noninteractive
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential meson ninja-build gettext pkgconf \
+            libglib2.0-dev libgtk-3-dev libvte-2.91-dev libflatpak-dev
+
+      - name: Configure
+        run: meson setup build --prefix=/usr -Dwerror=true -Dpreview=true ${{ matrix.options }}
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Install
+        run: DESTDIR="$PWD/staging" meson install -C build

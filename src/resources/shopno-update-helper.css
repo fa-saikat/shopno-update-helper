@@ -1,0 +1,165 @@
+/*
+ * Shopno Update Helper styles. Colors come from the GTK theme where it
+ * has one; the status colors work on light and dark themes.
+ */
+
+.shopno-body {
+  padding: 28px 36px;
+}
+
+.shopno-header {
+  padding: 20px 24px 14px 24px;
+}
+
+.shopno-content {
+  margin: 0 24px;
+}
+
+.shopno-footer {
+  padding: 14px 24px 16px 24px;
+}
+
+.shopno-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.shopno-heading {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.shopno-strong {
+  font-weight: bold;
+}
+
+.shopno-dim {
+  opacity: 0.72;
+}
+
+.shopno-small {
+  font-size: 0.9em;
+}
+
+.shopno-mono {
+  font-family: monospace;
+  font-size: 0.9em;
+  opacity: 0.72;
+}
+
+.shopno-accent {
+  color: @theme_selected_bg_color;
+}
+
+.shopno-success {
+  color: #26a269;
+}
+
+.shopno-warning {
+  color: #c88800;
+}
+
+.shopno-error {
+  color: #d0323d;
+}
+
+/* Lists */
+
+list.shopno-list {
+  background-color: @theme_base_color;
+}
+
+list.shopno-list > row {
+  padding: 0;
+  border-bottom: 1px solid alpha(currentColor, 0.08);
+}
+
+list.shopno-list > row:last-child {
+  border-bottom: none;
+}
+
+list.shopno-list > row.shopno-section {
+  padding: 6px 14px;
+  font-size: 0.8em;
+  font-weight: bold;
+  background-color: alpha(currentColor, 0.04);
+}
+
+.shopno-item,
+.shopno-source {
+  padding: 7px 14px;
+}
+
+.shopno-runtimes {
+  padding: 6px 0 2px 18px;
+}
+
+/* Notices */
+
+.shopno-notice {
+  padding: 10px 14px;
+  margin: 0 24px 12px 24px;
+  border-radius: 6px;
+  border: 1px solid alpha(#e5a50a, 0.45);
+  background-color: alpha(#e5a50a, 0.14);
+}
+
+.shopno-body .shopno-notice {
+  margin: 0;
+}
+
+.shopno-question {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid alpha(@theme_selected_bg_color, 0.45);
+  background-color: alpha(@theme_selected_bg_color, 0.12);
+}
+
+/* Steps */
+
+.shopno-step-number {
+  min-width: 22px;
+  min-height: 22px;
+  border-radius: 999px;
+  border: 2px solid alpha(currentColor, 0.25);
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.shopno-step-title {
+  opacity: 0.72;
+}
+
+.shopno-step-active .shopno-step-number {
+  border-color: @theme_selected_bg_color;
+  background-color: @theme_selected_bg_color;
+  color: @theme_selected_fg_color;
+}
+
+.shopno-step-active .shopno-step-title,
+.shopno-step-done .shopno-step-title,
+.shopno-step-failed .shopno-step-title {
+  opacity: 1;
+  font-weight: bold;
+}
+
+.shopno-step-done .shopno-step-number {
+  border-color: #26a269;
+  background-color: #26a269;
+  color: #ffffff;
+}
+
+.shopno-step-failed .shopno-step-number {
+  border-color: #d0323d;
+  background-color: #d0323d;
+  color: #ffffff;
+}
+
+.shopno-step-line {
+  min-height: 2px;
+  background-color: alpha(currentColor, 0.15);
+}
+
+.shopno-terminal {
+  margin-top: 6px;
+}

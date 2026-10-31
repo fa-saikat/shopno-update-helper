@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Update Helper
+GenericName=Software Updater
+Comment=Check for and install system and Flatpak updates
+Exec=shopno-update-helper
+Icon=system-software-update
+Terminal=false
+Categories=GTK;System;PackageManager;
+Keywords=update;upgrade;apt;flatpak;software;packages;
+StartupNotify=true
+StartupWMClass=shopno-update-helper
