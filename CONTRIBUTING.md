@@ -86,3 +86,20 @@ and translate `po/<code>.po`.
 - Write commit messages in the imperative mood ("Add retry button"), with a
   short summary line and an optional body explaining why.
 - Include a screenshot for visual changes.
+
+## Releasing
+
+Releases are drafted by CI and published by hand:
+
+1. Branch `release/x.y.z` from `main`, set the version in `meson.build`, and
+   add a `packaging/debian/changelog` entry for `x.y.z-1`.
+2. Open a pull request into `main`. The package workflow builds and
+   test-installs every package, and checks that the branch name, the
+   version in `meson.build` and the changelog agree.
+3. Merge it. The workflow builds the packages from `main` again and attaches
+   them to a draft release for `vx.y.z`.
+4. Test the packages from the draft, edit its notes, and publish it.
+   Publishing creates the `vx.y.z` tag.
+
+Merging a `release/` branch is the only way a release gets drafted; tags
+pushed by hand do nothing.

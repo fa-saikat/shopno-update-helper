@@ -1,12 +1,12 @@
 name: Packages
 
-# Builds and test-installs the packages. On a version tag, also attaches
-# them to a draft GitHub release, to be checked and published by hand.
+# Builds and test-installs the packages. When a release/x.y.z pull request
+# is merged into main, also attaches them to a draft GitHub release, to be
+# tested and published by hand. Publishing creates the vx.y.z tag.
 
 on:
-  push:
-    tags: ['v*']
   pull_request:
+    types: [opened, synchronize, reopened, closed]
     paths:
       - 'packaging/**'
       - '.github/workflows/packages.yml'
@@ -25,11 +25,21 @@ defaults:
 jobs:
   version:
     name: Check version
+    # Of closed pull requests, only a merged release branch needs anything
+    if: >-
+      github.event.action != 'closed' ||
+      (github.event.pull_request.merged &&
+       github.event.pull_request.base.ref == 'main' &&
+       startsWith(github.event.pull_request.head.ref, 'release/'))
     runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # A merged pull request's own ref is gone; build what landed on main
+          ref: ${{ github.event.pull_request.merged && github.event.pull_request.merge_commit_sha || '' }}
 
       - id: version
         name: Read version
@@ -40,10 +50,20 @@ jobs:
           # The Debian changelog must carry the same version as meson.build
           grep -q "^$NAME ($version-" packaging/debian/changelog
 
-          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in meson.build"
-            exit 1
+          # A release branch must be named after the version it releases
+          branch=$HEAD_REF
+          if [ "${branch#release/}" != "$branch" ]; then
+            if [ "$branch" != "release/$version" ]; then
+              echo "::error::Branch $branch does not match version $version in meson.build"
+              exit 1
+            fi
+            if [ "$MERGED" = true ]; then
+              echo "release=true" >> "$GITHUB_OUTPUT"
+            fi
           fi
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          MERGED: ${{ github.event.pull_request.merged }}
 
   deb:
     name: ${{ matrix.label }} ${{ matrix.arch }} (.deb)
@@ -72,6 +92,8 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merged && github.event.pull_request.merge_commit_sha || '' }}
 
       - name: Install build dependencies
         run: |
@@ -109,7 +131,7 @@ jobs:
 
   release:
     name: Draft release
-    if: github.ref_type == 'tag'
+    if: needs.version.outputs.release == 'true'
     needs: [version, deb]
     runs-on: ubuntu-24.04
     permissions:
@@ -132,9 +154,22 @@ jobs:
           sha256sum * > SHA256SUMS
           cat SHA256SUMS
 
+      - name: Check the release is new
+        run: |
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "::error::A release for v$VERSION already exists"
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.version.outputs.version }}
+
+      # The tag is created when the draft is published
       - uses: softprops/action-gh-release@v2
         with:
           draft: true
+          tag_name: v${{ needs.version.outputs.version }}
+          target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
           name: Shopno Update Helper ${{ needs.version.outputs.version }}
           generate_release_notes: true
           files: dist/*
