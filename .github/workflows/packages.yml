@@ -46,26 +46,28 @@ jobs:
           fi
 
   deb:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.label }} ${{ matrix.arch }} (.deb)
     needs: version
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     container: ${{ matrix.image }}
     strategy:
       fail-fast: false
       matrix:
+        arch: [amd64, arm64]
+        distro: [debian13, debian12, ubuntu24.04, ubuntu22.04]
         include:
-          - name: Debian 13 (.deb)
+          - distro: debian13
+            label: Debian 13
             image: debian:trixie
-            suffix: debian13
-          - name: Debian 12 (.deb)
+          - distro: debian12
+            label: Debian 12
             image: debian:bookworm
-            suffix: debian12
-          - name: Ubuntu 24.04 (.deb)
+          - distro: ubuntu24.04
+            label: Ubuntu 24.04
             image: ubuntu:24.04
-            suffix: ubuntu24.04
-          - name: Ubuntu 22.04 (.deb)
+          - distro: ubuntu22.04
+            label: Ubuntu 22.04
             image: ubuntu:22.04
-            suffix: ubuntu22.04
     env:
       DEBIAN_FRONTEND: noninteractive
     steps:
@@ -82,8 +84,9 @@ jobs:
         run: |
           # One package per release, so the version says which one it is for
           version=${{ needs.version.outputs.version }}
-          sed -i "1s/($version-\([0-9]*\))/($version-\1~${{ matrix.suffix }})/" debian/changelog
+          sed -i "1s/($version-\([0-9]*\))/($version-\1~${{ matrix.distro }})/" debian/changelog
           dpkg-buildpackage -b -us -uc
+          test "$(dpkg-architecture -qDEB_HOST_ARCH)" = ${{ matrix.arch }}
           mkdir out
           mv ../*.deb out/
           ls -l out
@@ -101,7 +104,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: deb-${{ matrix.suffix }}
+          name: deb-${{ matrix.distro }}-${{ matrix.arch }}
           path: out/${{ env.NAME }}_*.deb
 
   release:

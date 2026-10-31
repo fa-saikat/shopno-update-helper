@@ -107,12 +107,20 @@ Download the package for your distribution from the
 [latest release](https://github.com/fa-saikat/shopno-update-helper/releases/latest),
 then install it:
 
-| Distribution              | File                       | Install with                                         |
-|---------------------------|----------------------------|------------------------------------------------------|
-| Debian 13                 | `*.debian13_amd64.deb`     | `sudo apt install ./shopno-update-helper_*.deb`      |
-| Debian 12                 | `*.debian12_amd64.deb`     | `sudo apt install ./shopno-update-helper_*.deb`      |
-| Ubuntu 24.04, Mint 22     | `*.ubuntu24.04_amd64.deb`  | `sudo apt install ./shopno-update-helper_*.deb`      |
-| Ubuntu 22.04, Mint 21     | `*.ubuntu22.04_amd64.deb`  | `sudo apt install ./shopno-update-helper_*.deb`      |
+| Distribution              | File                        |
+|---------------------------|-----------------------------|
+| Debian 13                 | `*.debian13_<arch>.deb`     |
+| Debian 12                 | `*.debian12_<arch>.deb`     |
+| Ubuntu 24.04, Mint 22     | `*.ubuntu24.04_<arch>.deb`  |
+| Ubuntu 22.04, Mint 21     | `*.ubuntu22.04_<arch>.deb`  |
+
+`<arch>` is `amd64` for most PCs, or `arm64` for 64-bit ARM systems such as
+the Raspberry Pi 4 and 5. `dpkg --print-architecture` tells you which you
+have.
+
+```sh
+sudo apt install ./shopno-update-helper_*.deb
+```
 
 Each release also has a `SHA256SUMS` file to check the downloads with
 `sha256sum -c --ignore-missing SHA256SUMS`.
