@@ -24,13 +24,14 @@
 #include "shopno-update-window.h"
 #include "shopno-update-window-preview.h"
 
-#define MIN_WIDTH      480
-#define DEFAULT_WIDTH  560
-#define DEFAULT_HEIGHT 520
+/* The window can't be resized: it takes this size, or more when a page
+ * needs it */
+#define PAGE_WIDTH     560
+#define PAGE_HEIGHT    520
 
-/* Big enough for an 80×24 debconf dialog */
-#define DETAILS_WIDTH  780
-#define DETAILS_HEIGHT 740
+/* Big enough for a debconf dialog */
+#define TERMINAL_COLUMNS 80
+#define TERMINAL_ROWS    24
 
 #define BIG_ICON_SIZE  64
 #define ROW_ICON_SIZE  24
@@ -502,19 +503,22 @@ step_new (ShopnoUpdateWindow *self,
 
 
 
+/* The terminal's size request is what makes the window grow when Details
+ * opens, and shrink back when it closes */
 static void
-on_details_expanded (GtkExpander        *expander,
-                     GParamSpec         *pspec,
-                     ShopnoUpdateWindow *self)
+on_terminal_char_size_changed (VteTerminal       *terminal,
+                               guint              char_width,
+                               guint              char_height,
+                               GtkScrolledWindow *scrolled)
 {
-  gint width, height;
+  GtkStyleContext *context = gtk_widget_get_style_context (GTK_WIDGET (terminal));
+  GtkBorder padding;
 
-  if (!gtk_expander_get_expanded (expander))
-    return;
-
-  gtk_window_get_size (GTK_WINDOW (self), &width, &height);
-  if (width < DETAILS_WIDTH || height < DETAILS_HEIGHT)
-    gtk_window_resize (GTK_WINDOW (self), MAX (width, DETAILS_WIDTH), MAX (height, DETAILS_HEIGHT));
+  gtk_style_context_get_padding (context, gtk_style_context_get_state (context), &padding);
+  gtk_widget_set_size_request (GTK_WIDGET (terminal),
+                               TERMINAL_COLUMNS * char_width + padding.left + padding.right, -1);
+  gtk_scrolled_window_set_min_content_height (scrolled,
+                                              TERMINAL_ROWS * char_height + padding.top + padding.bottom);
 }
 
 
@@ -568,18 +572,17 @@ build_installing_page (ShopnoUpdateWindow *self)
   gtk_widget_hide (self->input_bar);
 
   self->terminal = VTE_TERMINAL (vte_terminal_new ());
-  vte_terminal_set_size (self->terminal, 80, 24);
+  vte_terminal_set_size (self->terminal, TERMINAL_COLUMNS, TERMINAL_ROWS);
   vte_terminal_set_scrollback_lines (self->terminal, 10000);
   vte_terminal_set_mouse_autohide (self->terminal, TRUE);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (scrolled), GTK_WIDGET (self->terminal));
-  gtk_widget_set_size_request (scrolled, -1, 380);
   gtk_widget_set_vexpand (scrolled, TRUE);
   add_class (scrolled, "shopno-terminal");
+  g_signal_connect (self->terminal, "char-size-changed", G_CALLBACK (on_terminal_char_size_changed), scrolled);
 
   self->details = GTK_EXPANDER (gtk_expander_new_with_mnemonic (_("_Details")));
   gtk_container_add (GTK_CONTAINER (self->details), scrolled);
-  g_signal_connect (self->details, "notify::expanded", G_CALLBACK (on_details_expanded), self);
 
   self->apt_upgrade = shopno_apt_upgrade_new (self->terminal);
 
@@ -1730,14 +1733,12 @@ shopno_update_window_init (ShopnoUpdateWindow *self)
 
   gtk_window_set_title (GTK_WINDOW (self), _("Update Helper"));
   gtk_window_set_icon_name (GTK_WINDOW (self), "system-software-update");
-  gtk_window_set_default_size (GTK_WINDOW (self), DEFAULT_WIDTH, DEFAULT_HEIGHT);
+  gtk_window_set_resizable (GTK_WINDOW (self), FALSE);
   gtk_window_set_position (GTK_WINDOW (self), GTK_WIN_POS_CENTER);
 
   self->stack = GTK_STACK (gtk_stack_new ());
 
-  /* Wrapping labels ask for a lot of height at their narrowest, which
-   * would make the window open needlessly tall */
-  gtk_widget_set_size_request (GTK_WIDGET (self->stack), MIN_WIDTH, -1);
+  gtk_widget_set_size_request (GTK_WIDGET (self->stack), PAGE_WIDTH, PAGE_HEIGHT);
   gtk_stack_set_transition_type (self->stack, GTK_STACK_TRANSITION_TYPE_CROSSFADE);
   gtk_stack_add_named (self->stack, build_checking_page (self), "checking");
   gtk_stack_add_named (self->stack, build_updates_page (self), "updates");
