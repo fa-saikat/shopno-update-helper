@@ -1,3 +1,10 @@
+shopno-update-helper (0.1.1-1) unstable; urgency=medium
+
+  * Show the app as "System Update" in menus and in the window title.
+  * Move it back to the System menu, out of the Xfce Settings Manager.
+
+ -- FA Saikat <fahimabrar.saikat@gmail.com>  Sun, 01 Nov 2026 16:30:00 +0600
+
 shopno-update-helper (0.1.0-1) unstable; urgency=medium
 
   * Initial release.
