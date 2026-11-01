@@ -54,7 +54,7 @@ main (int    argc,
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
 
-  g_set_application_name (_("Update Helper"));
+  g_set_application_name (_("System Update"));
 
   /* G_APPLICATION_DEFAULT_FLAGS needs GLib 2.74; Ubuntu 22.04 has 2.72 */
   application = gtk_application_new (APPLICATION_ID, (GApplicationFlags) 0);

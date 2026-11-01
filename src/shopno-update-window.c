@@ -1717,7 +1717,7 @@ shopno_update_window_init (ShopnoUpdateWindow *self)
 {
   self->flatpak_log = g_string_new (NULL);
 
-  gtk_window_set_title (GTK_WINDOW (self), _("Update Helper"));
+  gtk_window_set_title (GTK_WINDOW (self), _("System Update"));
   gtk_window_set_icon_name (GTK_WINDOW (self), "system-software-update");
   gtk_window_set_resizable (GTK_WINDOW (self), FALSE);
   gtk_window_set_position (GTK_WINDOW (self), GTK_WIN_POS_CENTER);
