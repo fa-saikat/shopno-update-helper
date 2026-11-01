@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Update Helper
+Name=System Update
 GenericName=Software Updater
 Comment=Check for and install system and Flatpak updates
 Exec=shopno-update-helper
